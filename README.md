@@ -1,2 +1,4 @@
 # Kymus
-A service that compresses standard language into a min of 2 bytes per word and using symetric dictionaries that common channels must share in order to decompress 
+A compression service that encodes natural-language text using a shared, versioned dictionary (codebook). Each in-dictionary word is represented as a fixed 16-bit token (2 bytes), enabling high-throughput messaging over low-bandwidth links. Sender and receiver must use the same dictionary version to decode messages; out-of-dictionary tokens fall back to an escape format (e.g., raw bytes or smaller sub-encodings).
+
+Intended for constrained networks such as LoRaWAN and mesh messaging systems (e.g., Meshtastic/MeshCore), where per-message payloads are tightly limited. By encoding common words as fixed 16-bit tokens, this service effectively increases the amount of human-readable language carried per packet—delivering higher language throughput without increasing the underlying packet size.
