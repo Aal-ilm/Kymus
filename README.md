@@ -1,4 +1,42 @@
 # Kymus
-A compression service that encodes natural-language text using a shared, versioned dictionary (codebook). Each in-dictionary word is represented as a fixed 16-bit token (2 bytes), enabling high-throughput messaging over low-bandwidth links. Sender and receiver must use the same dictionary version to decode messages; out-of-dictionary tokens fall back to an escape format (e.g., raw bytes or smaller sub-encodings).
 
-Intended for constrained networks such as LoRaWAN and mesh messaging systems (e.g., Meshtastic/MeshCore), where per-message payloads are tightly limited. By encoding common words as fixed 16-bit tokens, this service effectively increases the amount of human-readable language carried per packet—delivering higher language throughput without increasing the underlying packet size.
+A dictionary-based text compression service designed for constrained 
+mesh networks. Built to solve a real problem: Meshtastic limits messages 
+to 200 characters over LoRa. Kymus encodes common words as fixed 16-bit 
+tokens (2 bytes) against a shared versioned codebook, increasing 
+human-readable content per packet without increasing packet size.
+
+## The Problem
+
+LoRaWAN and mesh networks like Meshtastic/MeshCore impose tight payload 
+limits — often 200 bytes or fewer per message. Standard text is 
+inefficient at these scales. Kymus trades per-word byte cost for token 
+lookups, delivering more language per packet.
+
+## How It Works
+
+- Each word in the shared codebook is assigned a fixed 16-bit token
+- Sender encodes text → token stream using the codebook
+- Receiver decodes token stream → text using the same codebook version
+- Out-of-dictionary words fall back to an escape format (raw bytes)
+- Codebook is versioned — sender and receiver must share the same version
+
+## Example
+
+| Input | Raw Bytes | Kymus Encoded |
+|-------|-----------|---------------|
+| "meet at the bridge at noon" | 26 bytes | ~12 bytes |
+
+## Intended Use Cases
+
+- Meshtastic/MeshCore mesh messaging
+- LoRaWAN uplinks
+- Any constrained network with fixed payload limits
+
+## Status
+
+🚧 Active development
+
+## License
+
+Apache 2.0
