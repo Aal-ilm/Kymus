@@ -23,9 +23,9 @@ lookups, delivering more language per packet.
 
 ## Example
 
-| Input | Raw Bytes | Kymus Encoded |
-|-------|-----------|---------------|
-| "meet at the bridge at noon" | 26 bytes | ~12 bytes |
+| Input                        | Raw Bytes | Kymus Encoded |
+|------------------------------|-----------|---------------|
+| "meet at the bridge at noon" | 26 bytes  | ~12 bytes     |
 
 ## Intended Use Cases
 
