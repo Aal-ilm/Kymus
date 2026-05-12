@@ -9,7 +9,7 @@ human-readable content per packet without increasing packet size.
 ## The Problem
 
 LoRaWAN and mesh networks like Meshtastic/MeshCore impose tight payload 
-limits — often 200 bytes or fewer per message. Standard text is 
+limits: often 200 bytes or fewer per message. Standard text is 
 inefficient at these scales. Kymus trades per-word byte cost for token 
 lookups, delivering more language per packet.
 
