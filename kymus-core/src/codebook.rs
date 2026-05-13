@@ -1,9 +1,7 @@
 //! Codebook module — handles word-to-token mapping
 //! for the Kymus compression protocol.
 
-
 use std::collections::HashMap;
-use std::ptr::null;
 
 const DEFAULT_WORDLIST: &str = include_str!("../../codebooks/english-60k.txt");
 
@@ -34,13 +32,12 @@ impl Codebook{
             word_to_token.insert(word.to_string(), word_token);
             token_to_word.insert(word_token, word.to_string());
         }
-
         Codebook { word_to_token, token_to_word}
     }
 
-    
     pub fn lookup_word(&self, word: &str) -> Option<Token> {
         self.word_to_token.get(word).copied().map(Token)
     }
-
 }
+
+
