@@ -5,6 +5,7 @@ use std::collections::HashMap;
 
 const DEFAULT_WORDLIST: &str = include_str!("../../codebooks/english-60k.txt");
 
+#[derive(Debug, PartialEq, Copy, Clone)]
 pub struct Token(pub u16);
 
 pub struct Codebook{
@@ -22,12 +23,12 @@ impl Codebook{
 
     // Tokenizes the word list into a hashmap
     pub fn tokenize_words(wordlist: &str) -> Self{
-        let total_words = DEFAULT_WORDLIST.lines().count();
+        let total_words = wordlist.lines().count();
         let mut word_to_token = HashMap::with_capacity(total_words);
         let mut token_to_word = HashMap::with_capacity(total_words);
 
         // setting the hashmap to words as tokens
-        for(i, word) in DEFAULT_WORDLIST.lines().enumerate(){
+        for(i, word) in wordlist.lines().enumerate(){
             let word_token = (i +1) as u16;
             word_to_token.insert(word.to_string(), word_token);
             token_to_word.insert(word_token, word.to_string());
@@ -40,4 +41,17 @@ impl Codebook{
     }
 }
 
+//     ---------------------- TESTS ----------------------
 
+#[cfg(test)]
+mod tests{
+    use super::*;
+    #[test]
+    fn lookup_word_test() {
+        let words = "hello\nworld\nthis\nis\na\ntest";
+        let book = Codebook::new(Some(words));
+
+        assert_eq!(book.lookup_word("hello"), Some(Token(1)));  // pass
+        assert_ne!(book.lookup_word("hello"), Some(Token(4)));  // fail
+    }
+}

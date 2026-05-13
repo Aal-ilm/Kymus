@@ -1,6 +1,6 @@
 mod encoder;
 mod decoder;
-mod codebook;
+pub mod codebook;
 
 pub fn add(left: u64, right: u64) -> u64 {
     left + right
