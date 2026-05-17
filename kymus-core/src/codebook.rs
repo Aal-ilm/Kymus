@@ -1,6 +1,5 @@
-//! Codebook module — handles word-to-token mapping
+//! Codebook module - handles word-to-token mapping
 //! for the Kymus compression protocol.
-
 use std::collections::HashMap;
 
 const DEFAULT_WORDLIST: &str = include_str!("../../codebooks/english-60k.txt");
@@ -14,7 +13,7 @@ pub struct Codebook{
 }
 
 impl Codebook{
-    pub fn new(wordlist: Option<&str>) -> Self {
+    pub fn new(wordlist: Option<&str>) -> Self { // Constructor
         match wordlist {
             Some(wordlist) => Self::tokenize_words(wordlist),
             None => Self::tokenize_words(DEFAULT_WORDLIST),
@@ -36,8 +35,12 @@ impl Codebook{
         Codebook { word_to_token, token_to_word}
     }
 
-    pub fn lookup_word(&self, word: &str) -> Option<Token> {
+    pub fn get_token(&self, word: &str) -> Option<Token> {
         self.word_to_token.get(word).copied().map(Token)
+    }
+
+    pub fn get_word(&self, token: Token) -> Option<&str> {
+        self.token_to_word.get(&token.0).map(|s| s.as_str())
     }
 }
 
@@ -47,11 +50,20 @@ impl Codebook{
 mod tests{
     use super::*;
     #[test]
-    fn lookup_word_test() {
+    fn get_token_test() {
         let words = "hello\nworld\nthis\nis\na\ntest";
         let book = Codebook::new(Some(words));
 
-        assert_eq!(book.lookup_word("hello"), Some(Token(1)));  // pass
-        assert_ne!(book.lookup_word("hello"), Some(Token(4)));  // fail
+        assert_eq!(book.get_token("hello"), Some(Token(1)));  // Pass
+        assert_ne!(book.get_token("hello"), Some(Token(4)));  // Fail
     }
+
+    #[test]
+    fn get_word_test() {
+        let words = "hello\nworld\nthis\nis\na\ntest";
+        let book = Codebook::new(Some(words));
+        assert_eq!(book.get_word(Token(1)), Some("hello")); // Pass
+        assert_ne!(book.get_word(Token(2)), Some("test"));  // Fail
+    }
+
 }

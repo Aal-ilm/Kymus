@@ -1,5 +1,5 @@
-mod encoder;
-mod decoder;
+pub mod encoder;
+pub mod decoder;
 pub mod codebook;
 
 pub fn add(left: u64, right: u64) -> u64 {
