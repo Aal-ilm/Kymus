@@ -24,6 +24,7 @@ impl Codebook{
     ///
     /// # Examples
     /// ```
+    /// use kymus_core::codebook::Codebook;
     /// let book = Codebook::new(None);
     /// let custom = Codebook::new(Some("hello\nworld"));
     /// ```
