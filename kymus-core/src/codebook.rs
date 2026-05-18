@@ -56,7 +56,10 @@ mod tests{
         let book = Codebook::new(Some(words));
 
         assert_eq!(book.get_token("hello"), Some(Token(1)));  // Pass
-        assert_ne!(book.get_token("hello"), Some(Token(4)));  // Fail
+        assert_eq!(book.get_token("world"), Some(Token(2)));  // Pass
+        assert_eq!(book.get_token("this"),  Some(Token(3)));  // Pass
+        assert_eq!(book.get_token("is"),    Some(Token(4)));  // Pass
+        assert_ne!(book.get_token("hello"), Some(Token(5)));  // Fail
     }
 
     #[test]

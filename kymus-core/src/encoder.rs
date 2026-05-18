@@ -9,6 +9,8 @@ pub struct Encoder {
     pub codebook: Codebook,
 }
 
+
+// Encoder handles encoding and decoding of the raw string or tokenized payloads.
 impl Encoder {
     pub fn new(text: Option<&str>) -> Self {
         match text {
@@ -62,9 +64,15 @@ mod tests {
         let mut encoder = Encoder::new(Some("test it today"));
         encoder.encode();
 
-        for item in encoder.text_tokenized.iter(){
-            println!("{}", item);
-        }
+        // for item in encoder.text_tokenized.iter(){
+        //     println!("{}", item);
+        // }
+        println!("{:?}", encoder.text_tokenized);
+
+
+        assert_eq!(encoder.text_tokenized[0], 514);
+        assert_eq!(encoder.text_tokenized[1], 11);
+        assert_eq!(encoder.text_tokenized[2], 592);
     }
 
     #[test]
@@ -79,9 +87,11 @@ mod tests {
 
         let list = encoder.decode();
 
-        for item in list.clone() {
-                println!("{}", item);
-        }
+        // for item in list.clone() {
+        //         println!("{}", item);
+        // }
+
+        println!("{:?}",  list);
 
         assert_eq!(list[0], "test");
         assert_eq!(list[1], "it");
