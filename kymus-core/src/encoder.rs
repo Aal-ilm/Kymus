@@ -1,7 +1,6 @@
 //! Encode module - handles Encoding of input text
 //! for the Kymus compression protocol.
 
-use std::ptr::{null, null_mut};
 use crate::codebook::{Codebook, Token};
 
 pub struct Encoder {
@@ -11,11 +10,23 @@ pub struct Encoder {
 }
 
 impl Encoder {
-    pub fn new(text: &str) -> Self {
-        Encoder{
-            text: text.split_whitespace().map(|t| t.to_string()).collect(),
-            text_tokenized: Vec::new(),
-            codebook: Codebook::new(None),
+    pub fn new(text: Option<&str>) -> Self {
+        match text {
+            Some(text) => {
+                Encoder{
+                text: text.split_whitespace().map(|t| t.to_string()).collect(),
+                text_tokenized: Vec::new(),
+                codebook: Codebook::new(None),
+                }
+            }
+
+            None => {
+                Encoder{
+                    text: Vec::new(),
+                    text_tokenized: Vec::new(),
+                    codebook: Codebook::new(None)
+                }
+            }
         }
     }
 
@@ -48,11 +59,18 @@ mod tests {
 
     #[test]
     fn encode_test(){
-        let mut encoder = Encoder::new("test it today");
+        let mut encoder = Encoder::new(Some("test it today"));
         encoder.encode();
 
         for item in encoder.text_tokenized.iter(){
             println!("{}", item);
         }
+    }
+
+    #[test]
+    fn decode_test(){
+        let codebook = Codebook::new(None);
+        let mut encoder = Encoder::new(None);
+        encoder.codebook = codebook.clone();
     }
 }

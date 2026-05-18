@@ -7,6 +7,7 @@ const DEFAULT_WORDLIST: &str = include_str!("../../codebooks/english-60k.txt");
 #[derive(Debug, PartialEq, Copy, Clone)]
 pub struct Token(pub u16);
 
+#[derive(Debug, PartialEq, Clone)]
 pub struct Codebook{
     word_to_token: HashMap<String, u16>,
     token_to_word: HashMap<u16, String>
