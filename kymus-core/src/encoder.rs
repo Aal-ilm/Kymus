@@ -1,23 +1,29 @@
 //! Encode module - handles Encoding of input text
 //! for the Kymus compression protocol.
 
-use crate::codebook::{Codebook, Token};
+use crate::codebook::{Codebook, Token, CODEBOOK};
 
 pub struct Encoder {
     pub text: Vec<String>,
     pub text_tokenized: Vec<u16>,
-    pub codebook: Codebook,
 }
 
 // Encoder handles encoding and decoding of the raw string or tokenized payloads.
 impl Encoder {
-    pub fn new(text: Option<&str>) -> Self {
+    pub fn new(text: Option<&str>, codebook_path: Option<&str>) -> Self {
+        // Setting codebook singleton reference
+        match codebook_path {
+            Some(path) => {
+                CODEBOOK.set(Codebook::new(Some(path))).ok();
+            }
+            None => {CODEBOOK.set(Codebook::new(None)).ok();}
+        }
+
         match text {
             Some(text) => {
                 Encoder{
                 text: text.split_whitespace().map(|t| t.to_string()).collect(),
                 text_tokenized: Vec::new(),
-                codebook: Codebook::new(None),
                 }
             }
 
@@ -25,15 +31,16 @@ impl Encoder {
                 Encoder{
                     text: Vec::new(),
                     text_tokenized: Vec::new(),
-                    codebook: Codebook::new(None)
                 }
             }
         }
+
     }
 
     pub fn load_text(&mut self, text: &str) -> bool{
         if !text.is_empty(){
             self.text = text.split_whitespace().map(|t| t.to_string()).collect();
+            self.text_tokenized.clear();
             return true
         }
 
@@ -44,7 +51,7 @@ impl Encoder {
     // Uses the value in the Encoder struct
     pub fn encode(&mut self) -> Vec<u16> {
         for word in self.text.iter(){
-            match self.codebook.get_token(word.as_str()) {
+            match CODEBOOK.get().unwrap().get_token(word.as_str()) {
                 Some(token) => self.text_tokenized.push(token.0),
                 None => println!( "Word does not exist in Map: {}", word.as_str() ),
             }
@@ -55,7 +62,7 @@ impl Encoder {
     pub fn decode(&mut self) -> Vec<String> {
         let mut decoded: Vec<String> = Vec::new();
         for token in self.text_tokenized.iter() {
-            decoded.push(self.codebook.get_word(Token(*token)).unwrap().to_string());
+            decoded.push(CODEBOOK.get().unwrap().get_word(Token(*token)).unwrap().to_string());
         }
         decoded
     }
@@ -69,7 +76,7 @@ mod tests {
 
     #[test]
     fn encode_test(){
-        let mut encoder = Encoder::new(Some("test it today"));
+        let mut encoder = Encoder::new(Some("test it today"), None);
         encoder.encode();
 
         println!("{:?}", encoder.text_tokenized);
@@ -87,7 +94,7 @@ mod tests {
         tokens.push(11); // Expect: it
         tokens.push(592); // Expect: today
 
-        let mut encoder = Encoder::new(None);
+        let mut encoder = Encoder::new(None, None);
         encoder.text_tokenized = tokens;
 
         let list = encoder.decode();
@@ -101,7 +108,7 @@ mod tests {
 
     #[test]
     fn load_text_test(){
-        let mut encoder = Encoder::new(None);
+        let mut encoder = Encoder::new(None, None);
         encoder.load_text("test it tomorrow");
         encoder.encode();
         println!("{:?}", encoder.text_tokenized);

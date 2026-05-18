@@ -1,19 +1,32 @@
 //! Codebook module - handles word-to-token mapping
 //! for the Kymus compression protocol.
 use std::collections::HashMap;
+use std::sync::{OnceLock};
 
 const DEFAULT_WORDLIST: &str = include_str!("../../codebooks/english-60k.txt");
 
 #[derive(Debug, PartialEq, Copy, Clone)]
 pub struct Token(pub u16);
 
+// Instantiated a sinlgeton for global reference of the codebook
+// pub static CODEBOOK: LazyLock<Codebook> = LazyLock::new(|| Codebook::new(None));
+pub static CODEBOOK: OnceLock<Codebook> = OnceLock::new();
+
 #[derive(Debug, PartialEq, Clone)]
 pub struct Codebook{
-    word_to_token: HashMap<String, u16>,
-    token_to_word: HashMap<u16, String>
+    word_to_token: HashMap<String, u16>, //Key: as 'Word'
+    token_to_word: HashMap<u16, String>  //Key: as 'Token'
 }
 
 impl Codebook{
+    /// Creates a new codebook from the given wordlist.
+    /// Pass `None` to use the default 60K English dictionary.
+    ///
+    /// # Examples
+    /// ```
+    /// let book = Codebook::new(None);
+    /// let custom = Codebook::new(Some("hello\nworld"));
+    /// ```
     pub fn new(wordlist: Option<&str>) -> Self { // Constructor
         match wordlist {
             Some(wordlist) => Self::tokenize_words(wordlist),
@@ -36,10 +49,12 @@ impl Codebook{
         Codebook { word_to_token, token_to_word}
     }
 
+    /// Returns the token for a word, or `None` if not in the dictionary.
     pub fn get_token(&self, word: &str) -> Option<Token> {
         self.word_to_token.get(word).copied().map(Token)
     }
 
+    /// Returns the word for a token, or `None` if the token is invalid.
     pub fn get_word(&self, token: Token) -> Option<&str> {
         self.token_to_word.get(&token.0).map(|s| s.as_str())
     }

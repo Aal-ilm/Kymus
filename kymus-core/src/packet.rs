@@ -12,14 +12,14 @@ struct Packet{
 impl Packet {
     pub fn new(buffer: Option<u8>) -> Self {
         Packet{
-            encoder: Encoder::new(None),
+            encoder: Encoder::new(None, None),
             payload: Vec::new(),
             buffer: buffer.unwrap_or(DEFAULT_BUFFER_SIZE)
         }
     }
 
     pub fn encode(&mut self, text: &str){
-    
+
     }
     pub fn set_buffer(&mut self, buffer: u8) {
         self.buffer = buffer;
