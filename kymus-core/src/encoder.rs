@@ -44,7 +44,7 @@ impl Encoder {
 
     pub fn decode(&mut self) -> Vec<String> {
         let mut decoded: Vec<String> = Vec::new();
-        for token in self.text_tokenized.iter(){
+        for token in self.text_tokenized.iter() {
             decoded.push(self.codebook.get_word(Token(*token)).unwrap().to_string());
         }
         decoded
@@ -69,8 +69,24 @@ mod tests {
 
     #[test]
     fn decode_test(){
-        let codebook = Codebook::new(None);
+        let mut tokens: Vec<u16> = Vec::new();
+        tokens.push(514); // Expect: test
+        tokens.push(11); // Expect: it
+        tokens.push(592); // Expect: today
+
         let mut encoder = Encoder::new(None);
-        encoder.codebook = codebook.clone();
+        encoder.text_tokenized = tokens;
+
+        let list = encoder.decode();
+
+        for item in list.clone() {
+                println!("{}", item);
+        }
+
+        assert_eq!(list[0], "test");
+        assert_eq!(list[1], "it");
+        assert_eq!(list[2], "today");
+
+
     }
 }
