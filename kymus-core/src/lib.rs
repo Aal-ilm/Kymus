@@ -1,5 +1,6 @@
 pub mod encoder;
 pub mod codebook;
+pub mod packet;
 
 pub fn add(left: u64, right: u64) -> u64 {
     left + right

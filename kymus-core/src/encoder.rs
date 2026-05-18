@@ -9,7 +9,6 @@ pub struct Encoder {
     pub codebook: Codebook,
 }
 
-
 // Encoder handles encoding and decoding of the raw string or tokenized payloads.
 impl Encoder {
     pub fn new(text: Option<&str>) -> Self {
@@ -32,6 +31,16 @@ impl Encoder {
         }
     }
 
+    pub fn load_text(&mut self, text: &str) -> bool{
+        if !text.is_empty(){
+            self.text = text.split_whitespace().map(|t| t.to_string()).collect();
+            return true
+        }
+
+        println!("HITT{}", "ohno");
+        false // returns if empty
+    }
+
     // Uses the value in the Encoder struct
     pub fn encode(&mut self) -> Vec<u16> {
         for word in self.text.iter(){
@@ -39,7 +48,6 @@ impl Encoder {
                 Some(token) => self.text_tokenized.push(token.0),
                 None => println!( "Word does not exist in Map: {}", word.as_str() ),
             }
-            // self.text_tokenized.push(self.codebook.get_token(word.as_str()).unwrap().0)
         }
         self.text_tokenized.clone()
     }
@@ -64,9 +72,6 @@ mod tests {
         let mut encoder = Encoder::new(Some("test it today"));
         encoder.encode();
 
-        // for item in encoder.text_tokenized.iter(){
-        //     println!("{}", item);
-        // }
         println!("{:?}", encoder.text_tokenized);
 
 
@@ -87,16 +92,18 @@ mod tests {
 
         let list = encoder.decode();
 
-        // for item in list.clone() {
-        //         println!("{}", item);
-        // }
-
         println!("{:?}",  list);
 
         assert_eq!(list[0], "test");
         assert_eq!(list[1], "it");
         assert_eq!(list[2], "today");
+    }
 
-
+    #[test]
+    fn load_text_test(){
+        let mut encoder = Encoder::new(None);
+        encoder.load_text("test it tomorrow");
+        encoder.encode();
+        println!("{:?}", encoder.text_tokenized);
     }
 }
