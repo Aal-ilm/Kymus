@@ -3,9 +3,17 @@
 
 use crate::codebook::{Codebook, Token, CODEBOOK};
 
+/// Represents a single encoded word in the Kymus protocol.
+/// Either a 16-bit dictionary token or a raw UTF-8 fallback
+/// for words not found in the codebook.
+#[derive(Debug, Clone, Eq, PartialEq)]
+pub enum EncodedWord {
+    Tokenized(u16),
+    Raw(String),
+}
 pub struct Encoder {
     pub text: Vec<String>,
-    pub text_tokenized: Vec<u16>,
+    pub text_tokenized: Vec<EncodedWord>,
 }
 
 // Encoder handles encoding and decoding of the raw string or tokenized payloads.
@@ -34,7 +42,6 @@ impl Encoder {
                 }
             }
         }
-
     }
 
     pub fn load_text(&mut self, text: &str) -> bool{
@@ -43,17 +50,20 @@ impl Encoder {
             self.text_tokenized.clear();
             return true
         }
-
-        println!("HITT{}", "ohno");
         false // returns if empty
     }
 
     // Uses the value in the Encoder struct
-    pub fn encode(&mut self) -> Vec<u16> {
+    pub fn encode(&mut self) -> Vec<EncodedWord> {
         for word in self.text.iter(){
             match CODEBOOK.get().unwrap().get_token(word.as_str()) {
-                Some(token) => self.text_tokenized.push(token.0),
-                None => println!( "Word does not exist in Map: {}", word.as_str() ),
+                Some(token) => {
+                    self.text_tokenized.push(EncodedWord::Tokenized(token.0));
+                },
+                None => {
+                    println!( "Word does not exist in Map: {}", word.as_str())
+
+                },
             }
         }
         self.text_tokenized.clone()
@@ -62,7 +72,19 @@ impl Encoder {
     pub fn decode(&mut self) -> Vec<String> {
         let mut decoded: Vec<String> = Vec::new();
         for token in self.text_tokenized.iter() {
-            decoded.push(CODEBOOK.get().unwrap().get_word(Token(*token)).unwrap().to_string());
+            match token {
+                EncodedWord::Tokenized(t) => {
+                    match CODEBOOK.get().unwrap().get_word(Token(*t)) {
+                        Some(word) => {
+                            decoded.push(word.to_string());
+                        }
+                        None => println!("Token not found: {}", t)
+                    }
+                }
+                EncodedWord::Raw(word) => {
+                    decoded.push(word.clone());
+                }
+            }
         }
         decoded
     }
@@ -76,23 +98,23 @@ mod tests {
 
     #[test]
     fn encode_test(){
-        let mut encoder = Encoder::new(Some("test it today"), None);
+        let mut encoder = Encoder::new(Some("test it today mansd09"), None);
         encoder.encode();
 
         println!("{:?}", encoder.text_tokenized);
 
 
-        assert_eq!(encoder.text_tokenized[0], 514);
-        assert_eq!(encoder.text_tokenized[1], 11);
-        assert_eq!(encoder.text_tokenized[2], 592);
+        assert_eq!(encoder.text_tokenized[0], EncodedWord::Tokenized(514));
+        assert_eq!(encoder.text_tokenized[1], EncodedWord::Tokenized(11));
+        assert_eq!(encoder.text_tokenized[2], EncodedWord::Tokenized(592));
     }
 
     #[test]
     fn decode_test(){
-        let mut tokens: Vec<u16> = Vec::new();
-        tokens.push(514); // Expect: test
-        tokens.push(11); // Expect: it
-        tokens.push(592); // Expect: today
+        let mut tokens: Vec<EncodedWord> = Vec::new();
+        tokens.push(EncodedWord::Tokenized(514)); // Expect: test
+        tokens.push(EncodedWord::Tokenized(11)); // Expect: it
+        tokens.push(EncodedWord::Tokenized(592)); // Expect: today
 
         let mut encoder = Encoder::new(None, None);
         encoder.text_tokenized = tokens;
