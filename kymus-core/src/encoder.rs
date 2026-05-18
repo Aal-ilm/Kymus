@@ -61,8 +61,8 @@ impl Encoder {
                     self.text_tokenized.push(EncodedWord::Tokenized(token.0));
                 },
                 None => {
-                    println!( "Word does not exist in Map: {}", word.as_str())
-
+                    println!( "Word does not exist in Map: {}", word.as_str());
+                    self.text_tokenized.push(EncodedWord::Raw(word.clone()));
                 },
             }
         }
@@ -87,6 +87,21 @@ impl Encoder {
             }
         }
         decoded
+    }
+
+    pub fn tokenized_tostring(&mut self) -> Vec<String> {
+        let mut words: Vec<String> = Vec::new();
+        for word in self.text_tokenized.iter() {
+            match word {
+                EncodedWord::Tokenized(t) => {
+                    words.push(t.to_string());
+                }
+                EncodedWord::Raw(word) => {
+                    words.push(word.clone());
+                }
+            }
+        }
+        words
     }
 }
 
