@@ -1,6 +1,7 @@
 //! Encode module - handles Encoding of input text
 //! for the Kymus compression protocol.
 
+use colored::Colorize;
 use crate::codebook::{Codebook, Token, CODEBOOK};
 
 /// Represents a single encoded word in the Kymus protocol.
@@ -61,7 +62,7 @@ impl Encoder {
                     self.text_tokenized.push(EncodedWord::Tokenized(token.0));
                 },
                 None => {
-                    println!( "Word does not exist in Map: {}", word.as_str());
+                    println!("{}", format!("[WARN] Not in dictionary: {}", word.as_str()).yellow());
                     self.text_tokenized.push(EncodedWord::Raw(word.clone()));
                 },
             }
@@ -78,7 +79,7 @@ impl Encoder {
                         Some(word) => {
                             decoded.push(word.to_string());
                         }
-                        None => println!("Token not found: {}", t)
+                        None => println!("{}", format!("[WARN] Not in dictionary: {}", t).yellow())
                     }
                 }
                 EncodedWord::Raw(word) => {
@@ -111,9 +112,12 @@ impl Encoder {
 mod tests {
     use super::*;
 
+
+    const UNFOUND_RAW_WORD: &str = "mansd09";
     #[test]
     fn encode_test(){
-        let mut encoder = Encoder::new(Some("test it today mansd09"), None);
+        let input = format!("test it today {}", UNFOUND_RAW_WORD);
+        let mut encoder = Encoder::new(Some(&input), None);
         encoder.encode();
 
         println!("{:?}", encoder.text_tokenized);
@@ -122,6 +126,7 @@ mod tests {
         assert_eq!(encoder.text_tokenized[0], EncodedWord::Tokenized(514));
         assert_eq!(encoder.text_tokenized[1], EncodedWord::Tokenized(11));
         assert_eq!(encoder.text_tokenized[2], EncodedWord::Tokenized(592));
+        assert_eq!(encoder.text_tokenized[3], EncodedWord::Raw(UNFOUND_RAW_WORD.to_string()));
     }
 
     #[test]
@@ -130,6 +135,7 @@ mod tests {
         tokens.push(EncodedWord::Tokenized(514)); // Expect: test
         tokens.push(EncodedWord::Tokenized(11)); // Expect: it
         tokens.push(EncodedWord::Tokenized(592)); // Expect: today
+        tokens.push(EncodedWord::Raw(UNFOUND_RAW_WORD.to_string()));
 
         let mut encoder = Encoder::new(None, None);
         encoder.text_tokenized = tokens;
@@ -141,6 +147,7 @@ mod tests {
         assert_eq!(list[0], "test");
         assert_eq!(list[1], "it");
         assert_eq!(list[2], "today");
+        assert_eq!(list[3], "mansd09");
     }
 
     #[test]
