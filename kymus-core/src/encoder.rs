@@ -62,7 +62,7 @@ impl Encoder {
                     self.text_tokenized.push(EncodedWord::Tokenized(token.0));
                 },
                 None => {
-                    println!("{}", format!("[WARN] Not in dictionary: {}", word.as_str()).yellow());
+                    println!("{}", format!("[WARN] Not in dictionary: {}", word.as_str()).yellow().bold());
                     self.text_tokenized.push(EncodedWord::Raw(word.clone()));
                 },
             }
@@ -70,7 +70,7 @@ impl Encoder {
         self.text_tokenized.clone()
     }
 
-    pub fn decode(&mut self) -> Vec<String> {
+    pub fn decode(&self) -> Vec<String> {
         let mut decoded: Vec<String> = Vec::new();
         for token in self.text_tokenized.iter() {
             match token {

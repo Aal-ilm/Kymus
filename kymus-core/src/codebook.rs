@@ -5,18 +5,23 @@ use std::sync::{OnceLock};
 
 const DEFAULT_WORDLIST: &str = include_str!("../../codebooks/english-60k.txt");
 
-#[derive(Debug, PartialEq, Copy, Clone)]
-pub struct Token(pub u16);
-
 // Instantiated a sinlgeton for global reference of the codebook
 // pub static CODEBOOK: LazyLock<Codebook> = LazyLock::new(|| Codebook::new(None));
 pub static CODEBOOK: OnceLock<Codebook> = OnceLock::new();
+
+#[derive(Debug, PartialEq, Copy, Clone)]
+pub struct Token(pub u16);
 
 #[derive(Debug, PartialEq, Clone)]
 pub struct Codebook{
     word_to_token: HashMap<String, u16>, //Key: as 'Word'
     token_to_word: HashMap<u16, String>  //Key: as 'Token'
 }
+
+
+// impl Token {
+//     pub(crate) fn
+// }
 
 impl Codebook{
     /// Creates a new codebook from the given wordlist.
@@ -85,5 +90,4 @@ mod tests{
         assert_eq!(book.get_word(Token(1)), Some("hello")); // Pass
         assert_ne!(book.get_word(Token(2)), Some("test"));  // Fail
     }
-
 }
