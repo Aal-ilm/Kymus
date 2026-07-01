@@ -62,14 +62,17 @@ impl Encoder {
     // Uses the value in the Encoder struct
     pub fn encode(&mut self) -> Vec<EncodedWord> {
         for word in self.text.iter(){
-            match CODEBOOK.get().unwrap().get_token(word.as_str()) {
-                Some(token) => {
-                    self.text_tokenized.push(EncodedWord::Tokenized(token.0));
-                },
-                None => {
-                    println!("{}", format!("[WARN] Not in dictionary: {}", word.as_str()).yellow().bold());
-                    self.text_tokenized.push(EncodedWord::Raw(word.clone()));
-                },
+            if word.len() == 1 && word.is_ascii() {
+                self.text_tokenized.push(EncodedWord::Raw(word.clone()));
+            }else {
+                match CODEBOOK.get().unwrap().get_token(word.as_str()) {
+                    Some(token) =>  self.text_tokenized.push(EncodedWord::Tokenized(token.0))
+                    ,
+                    None => {
+                        println!("{}", format!("[WARN] Not in dictionary: {}", word.as_str()).yellow().bold());
+                        self.text_tokenized.push(EncodedWord::Raw(word.clone()));
+                    },
+                }
             }
         }
         self.text_tokenized.clone()

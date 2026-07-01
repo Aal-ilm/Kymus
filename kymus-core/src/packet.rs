@@ -54,8 +54,7 @@ mod tests {
     #[test]
     fn construct_test(){
         let mut packet = Packet::new(None);
-        let pak =packet.construct("hello how are you ejwr0, coo coo!!").unwrap();
-
+        let pak =packet.construct("A hello how are you ejwr0, coo coo! !").unwrap();
         println!("{:?}", pak);
     }
 }
