@@ -1,7 +1,8 @@
+# Makefile for project wide executions
+
 all:
 	cargo clean
 	cargo nextest run
-
 build:
 	cargo build
 docs:
@@ -14,7 +15,6 @@ test:
 	cargo nextest run
 fmt:
 	cargo fmt
-
 run:
 	cargo run -p kymus-cli
 lint:

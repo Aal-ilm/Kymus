@@ -18,7 +18,6 @@ pub struct Codebook{
     token_to_word: HashMap<u16, String>  //Key: as 'Token'
 }
 
-
 // impl Token {
 //     pub(crate) fn
 // }

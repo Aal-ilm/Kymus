@@ -12,9 +12,12 @@ pub enum EncodedWord {
     Tokenized(u16),
     Raw(String),
 }
+
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub struct Encoder {
     pub text: Vec<String>,
     pub text_tokenized: Vec<EncodedWord>,
+    pub text_tokenized_tostring: Option<Vec<String>>,
 }
 
 // Encoder handles encoding and decoding of the raw string or tokenized payloads.
@@ -33,6 +36,7 @@ impl Encoder {
                 Encoder{
                 text: text.split_whitespace().map(|t| t.to_string()).collect(),
                 text_tokenized: Vec::new(),
+                text_tokenized_tostring: None,
                 }
             }
 
@@ -40,6 +44,7 @@ impl Encoder {
                 Encoder{
                     text: Vec::new(),
                     text_tokenized: Vec::new(),
+                    text_tokenized_tostring: None,
                 }
             }
         }
@@ -91,6 +96,10 @@ impl Encoder {
     }
 
     pub fn tokenized_tostring(&mut self) -> Vec<String> {
+        if !self.text_tokenized_tostring.is_none() {
+            return self.text_tokenized_tostring.clone().unwrap();
+        }
+
         let mut words: Vec<String> = Vec::new();
         for word in self.text_tokenized.iter() {
             match word {
@@ -102,6 +111,7 @@ impl Encoder {
                 }
             }
         }
+        self.text_tokenized_tostring = Some(words.clone());
         words
     }
 }
@@ -112,7 +122,6 @@ impl Encoder {
 mod tests {
     use super::*;
 
-
     const UNFOUND_RAW_WORD: &str = "mansd09";
     #[test]
     fn encode_test(){
@@ -121,7 +130,6 @@ mod tests {
         encoder.encode();
 
         println!("{:?}", encoder.text_tokenized);
-
 
         assert_eq!(encoder.text_tokenized[0], EncodedWord::Tokenized(514));
         assert_eq!(encoder.text_tokenized[1], EncodedWord::Tokenized(11));
@@ -132,9 +140,9 @@ mod tests {
     #[test]
     fn decode_test(){
         let mut tokens: Vec<EncodedWord> = Vec::new();
-        tokens.push(EncodedWord::Tokenized(514)); // Expect: test
-        tokens.push(EncodedWord::Tokenized(11)); // Expect: it
-        tokens.push(EncodedWord::Tokenized(592)); // Expect: today
+        tokens.push(EncodedWord::Tokenized(514));   // Expect: test
+        tokens.push(EncodedWord::Tokenized(11));    // Expect: it
+        tokens.push(EncodedWord::Tokenized(592));   // Expect: today
         tokens.push(EncodedWord::Raw(UNFOUND_RAW_WORD.to_string()));
 
         let mut encoder = Encoder::new(None, None);
